@@ -1,16 +1,16 @@
 import { writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { getPath } from '../utils/utils.js';
+import { join } from 'path';
+import { __dirname } from './pathUtils.js';
+import { checkFileExistence, FILE_MUST_NOT_EXIST } from '../utils/fileUtils.js';
 
-const filePath = getPath(fileURLToPath(import.meta.url), 'files', 'fresh.txt');
+async function createFile() {
+    try {
+        const filePath = join(__dirname, 'files', 'fresh.txt');
+        await checkFileExistence(filePath, FILE_MUST_NOT_EXIST);
+        await writeFile(filePath, 'I am fresh and young');
+    } catch (error) {
+        console.error(`Error in createFile: ${error.message}`);
+    }
+}
 
-const create = async () => {
-  try {
-    await writeFile(filePath, 'I am fresh and young', { flag: 'wx' });
-    console.log('File created successfully');
-  } catch (error) {
-    console.error('FS operation failed');
-  }
-};
-
-await create();
+createFile();

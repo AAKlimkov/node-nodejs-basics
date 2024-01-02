@@ -1,20 +1,18 @@
-import { fileURLToPath } from 'url';
-import fs from 'fs/promises'
-import { getPath,  } from '../utils/utils.js';
+import { join } from 'path';
+import { __dirname } from './pathUtils.js';
+import { checkFileExistence, FILE_MUST_NOT_EXIST, copyDir } from '../utils/fileUtils.js';
 
-const sourcePath = getPath(fileURLToPath(import.meta.url), 'files');
+async function copyFiles() {
+    try {
+        const srcDir = join(__dirname, 'files');
+        const destDir = join(__dirname, 'files_copy');
 
-
-const copy = async () => {
-  try {
-      const sourceStats = await fs.stat(sourcePath);
-      if (!sourceStats.isDirectory()) {
-        throw new Error('Source is not a directory');
-      }
-  }
-  catch (error) {
-      throw new Error(`FS operation failed: ${error.message}`);
+        await checkFileExistence(srcDir);
+        await checkFileExistence(destDir, FILE_MUST_NOT_EXIST);
+        await copyDir(srcDir, destDir);
+    } catch (error) {
+        console.error(`Error in copyFiles: ${error.message}`);
     }
-};
+}
 
-await copy();
+copyFiles();

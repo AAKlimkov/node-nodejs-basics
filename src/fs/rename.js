@@ -1,17 +1,19 @@
-import { rename as fsRename } from 'fs/promises'
-import { fileURLToPath } from 'url';
-import { getPath, isFileExists } from '../utils/utils.js';
-const sourcePath = getPath(fileURLToPath(import.meta.url), 'files', 'wrongFilename.txt');
-const destPath = getPath(fileURLToPath(import.meta.url), 'files', 'properFilename.md');
-const errorMessage = 'FS operation failed'
+import { rename } from 'fs/promises';
+import { join } from 'path';
+import { __dirname } from './pathUtils.js';
+import { checkFileExistence, FILE_MUST_NOT_EXIST } from '../utils/fileUtils.js';
 
-const rename = async () => {
-  const isSourceFileExist = await isFileExists(sourcePath)
-  const isDestFileExist = await isFileExists(destPath)
-  if (isSourceFileExist & !isDestFileExist) {
-    await fsRename(sourcePath, destPath);
-  } else {
-    throw new Error(errorMessage);
-  }
+async function renameFile() {
+    try {
+        const oldPath = join(__dirname, 'files', 'wrongFilename.txt');
+        const newPath = join(__dirname, 'files', 'properFilename.md');
+
+        await checkFileExistence(oldPath);
+        await checkFileExistence(newPath, FILE_MUST_NOT_EXIST);
+        await rename(oldPath, newPath);
+    } catch (error) {
+        console.error(`Error in renameFile: ${error.message}`);
+    }
 }
-await rename()
+
+renameFile();
